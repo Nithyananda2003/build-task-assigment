@@ -11,7 +11,7 @@ assert.equal(manifest.d1,'DB');assert.ok(manifest.project_id);assert.equal(manif
 const migration = read('drizzle/0000_daily_spark.sql');assert.match(migration,/PRIMARY KEY \(user_id, day\)/);assert.match(migration,/CHECK\(points = 10 \+ correct \* 5\)/);
 const html=read('public/index.html');assert.match(html,/name="viewport"/);assert.match(html,/<html lang="en">/);
 assert.ok(!/https?:\/\//.test(html),'HTML must not load any third-party resource');
-const assets=['index.html','style.css','app.js','icon.svg','manifest.webmanifest','sw.js'];
+const assets=['index.html','style.css','app.js','api-client.js','icon.svg','manifest.webmanifest','sw.js'];
 const bytes=assets.reduce((sum,f)=>sum+Buffer.byteLength(read('public/'+f)),0);
 const zipped=assets.reduce((sum,f)=>sum+gzipSync(read('public/'+f)).length,0);
 assert.ok(zipped<25000,`Assets exceed the 25 kB gzip budget: ${zipped}`);

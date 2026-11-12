@@ -1,5 +1,5 @@
-const CACHE = 'daily-spark-shell-v1';
-const SHELL = ['/', '/style.css', '/app.js', '/icon.svg', '/manifest.webmanifest'];
+const CACHE = 'daily-spark-shell-v2';
+const SHELL = ['/', '/style.css', '/app.js', '/api-client.js', '/icon.svg', '/manifest.webmanifest'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL))); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('daily-spark-shell-') && k !== CACHE).map(k => caches.delete(k))))); });
 self.addEventListener('fetch', event => {

@@ -1,3 +1,5 @@
+import { requestApi } from './api-client.js';
+
 const icons = {
   sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>',
   spark: '<path d="m12 2 2.6 7.4L22 12l-7.4 2.6L12 22l-2.6-7.4L2 12l7.4-2.6L12 2Z"/>',
@@ -27,16 +29,7 @@ const safe = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'
 const fmtDate = (date, options) => new Intl.DateTimeFormat('en-IN', {timeZone:'Asia/Kolkata',...options}).format(new Date(date + 'T12:00:00+05:30'));
 const dayLabel = day => fmtDate(day, {day:'numeric',month:'short'});
 function toast(message) { const el = document.querySelector('#toast'); el.textContent = message; el.hidden = false; clearTimeout(toast.timer); toast.timer = setTimeout(() => el.hidden = true, 4500); }
-async function api(path, options = {}) {
-  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 15000);
-  try {
-    const response = await fetch(path, {credentials: 'same-origin', cache: 'no-store', ...options, signal: controller.signal});
-    const result = await response.json();
-    if (!response.ok) { const error = new Error(result.error || 'Please try again.'); error.code = result.code; throw error; }
-    return result;
-  } catch (error) { if (error.name === 'AbortError') throw new Error('The connection is taking a while. Please try again.'); if (error instanceof TypeError) throw new Error('You appear to be offline. Connect to the internet, then try again.'); throw error; }
-  finally { clearTimeout(timer); }
-}
+const api = requestApi;
 function setData(result) { data = result; serverOffset = Date.parse(data.serverNow) - Date.now(); }
 function expired() { return data && Date.now() + serverOffset >= Date.parse(data.resetsAt); }
 function remaining() {

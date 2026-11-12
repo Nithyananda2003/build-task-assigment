@@ -79,7 +79,7 @@ This is reliable reward accounting for a demo, not an anti-fraud system. A new a
 
 No framework, third-party fonts, images, trackers, or CDN requests. All assets are local and the compressed initial asset budget is checked by `node scripts/quality.mjs`. The app uses a 320-pixel mobile layout, large radio rows, native keyboard controls, visible focus indicators, a skip link, labelled progress bars and reduced-motion support. Main body and question text have readable contrast; decorative muted labels are secondary.
 
-The service worker caches the app shell after the first successful visit. It never caches API data. Reading progress and confirming a reward require an internet connection. Answer drafts live in sessionStorage so leaving and reopening a challenge in the same tab can resume it. Failed submissions retain answers and offer retry; a success is shown only after the server confirms it. Asset revalidation avoids an hour-long stale bundle after deployment.
+The service worker caches the app shell after the first successful visit. It never caches API data. Reading progress and confirming a reward require an internet connection. Answer drafts live in sessionStorage so leaving and reopening a challenge in the same tab can resume it. Failed submissions retain answers and offer retry; a success is shown only after the server confirms it. Progress reads retry temporary network or hosting failures twice within a 15-second total timeout. Non-JSON and malformed responses show a readable message instead of a parsing exception. Answer submissions are never automatically retried. Asset revalidation avoids an hour-long stale bundle after deployment.
 
 ## Production hosting
 
@@ -91,9 +91,10 @@ A new Sites deployment is private until sharing is changed. Check that external 
 
 ## Validation and limits
 
-19 automated domain and API tests cover scores, invalid input, server-owned dates, year/leap-day transitions, streak gaps, retained badges, level boundaries, distinct browser profiles, SQL persistence, concurrent replay, origin validation, payload limits, missing database errors, and retry after a committed result loses its response.
+26 automated domain, API and browser-client tests cover scores, invalid input, server-owned dates, year/leap-day transitions, streak gaps, retained badges, level boundaries, distinct browser profiles, SQL persistence, concurrent replay, origin validation, payload limits, missing database errors, retry after a committed result loses its response, non-JSON hosting errors, malformed responses, bounded read retries, and safe submission failures.
 
 Local browser QA exercises the phone-sized challenge and reward history. Browser QA evidence and any production verification notes are included in the delivery report. Tests establish local SQLite behavior; the production smoke check establishes deployed D1 behavior separately.
 
 Intentionally omitted: accounts/recovery, cross-device sync, cash payouts, rate limiting, notifications, localisation, a larger curated word bank, and a CMS. Production money handling needs verified identity, abuse controls, a financial ledger and reconciliation before integration with a payment provider. No such capability is implied by demo points.
+
 

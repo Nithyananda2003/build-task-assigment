@@ -1,6 +1,6 @@
 import {readFileSync, mkdirSync, writeFileSync} from 'node:fs';
 const types = {html: 'text/html; charset=utf-8', css: 'text/css; charset=utf-8', js: 'text/javascript; charset=utf-8', svg: 'image/svg+xml', webmanifest: 'application/manifest+json'};
-const files = ['index.html', 'style.css', 'app.js', 'icon.svg', 'manifest.webmanifest', 'sw.js'];
+const files = ['index.html', 'style.css', 'app.js', 'api-client.js', 'icon.svg', 'manifest.webmanifest', 'sw.js'];
 const assets = Object.fromEntries(files.map(name => ['/' + name, {type: types[name.split('.').pop()], body: readFileSync('public/' + name, 'utf8')} ]));
 const domain = readFileSync('worker/domain.js', 'utf8').replace(/^export /gm, '');
 const worker = readFileSync('worker/index.js', 'utf8').replace(/^import .*?;\r?\n/, '').replace('/*STATIC*/ {}', JSON.stringify(assets));
