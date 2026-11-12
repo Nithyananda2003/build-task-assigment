@@ -17,3 +17,5 @@
 @media(max-width:360px){.hero h2{font-size:29px}.hero-art{right:-33px;top:91px;transform:scale(.58)}.hero-copy{max-width:100%}.hero p{max-width:190px}.challenge-meta{font-size:11px;gap:10px}.badge-name{font-size:9px}.stat-label{font-size:10px}.full-badges .badge-name{font-size:13px}.hero .button{min-width:180px}}
 @media(max-width:580px){.badges{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.badge-card{padding:19px 10px}.badge-name{font-size:12px}.badge-status{font-size:11px}.badge-icon{width:40px;height:40px}.full-badges .badge-status{font-size:11px}.quiz-panel .eyebrow{font-size:11px}}
 @media(max-width:580px){.hero-art{top:5px;right:14px;transform:scale(.36);transform-origin:top right}.hero-art .word-bubble{display:none}.hero-copy{max-width:100%}.hero p{max-width:100%}.hero h2{font-size:30px}.hero .challenge-meta{margin-top:22px}.hero .hero-bottom{padding-top:12px;padding-bottom:12px}}
+.progress-layout>*{min-width:0}
+@media(max-width:580px){.week-wide .week{gap:4px}.week-wide .day-circle{width:28px;height:28px}.week-wide .week-day{font-size:11px}}
