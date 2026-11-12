@@ -1,0 +1,33 @@
+DAILY SPARK — BUILD EXPLAINER
+
+What I built
+
+Daily Spark is a two-minute daily English challenge. A person opens the app, answers three word-meaning questions, and gets a short explanation and an everyday example for each word. They earn points, grow a streak, move through levels, and unlock four badges. The reward page shows exactly where every point came from.
+
+I chose English vocabulary because it offers a useful, repeatable task with almost no setup. The first screen has one main action. Each question has three short answers, with no timer. A wrong answer becomes a small lesson rather than a punishment. Finishing earns 10 points, and each correct answer adds 5: a maximum of 25 per day.
+
+Choices for the audience
+
+The interface works from a 320-pixel phone screen up to a desktop. Navigation moves to the bottom on small screens. Answer rows are large enough to tap, and the app uses native radio buttons, keyboard focus indicators, labelled progress bars, reduced-motion support, and a skip link. The language is short and direct.
+
+There are no web fonts, photographs, analytics, or client libraries to download. HTML, CSS and JavaScript are served from one Cloudflare Worker. The app shell can be cached for a later visit; progress and rewards require a connection. A failed request keeps the answers on screen and offers a retry. It never invents an offline balance.
+
+Reward trust
+
+The server owns the date, answer keys and scoring. A new challenge opens at midnight India time. Changing a device clock does not change eligibility. Before completion, the API sends only words and choices; explanations are returned after the first completed attempt.
+
+Each browser has a private HttpOnly session cookie. Only a hash of that random token is used to associate database rows with the browser. Cloudflare D1 stores one completion per browser and day. A database primary key makes the insert atomic: repeated requests, double taps and a retry after a lost response cannot create a second reward. The first result stays final.
+
+The balance is the sum of saved reward entries, rather than a number supplied by the client. Streaks count consecutive days and allow the rest of today to complete the next challenge. A missed day resets the current streak, while points and previously earned badges remain.
+
+What I left out
+
+The points are explicitly demo points with no cash value. I did not build withdrawals, a fake cash conversion, paid upgrades, or a pretend leaderboard. Real payouts would need verified accounts, abuse controls, an immutable financial ledger, rate limits, reconciliation and a payment provider. Anonymous browser profiles are deliberately not sufficient identity for that system: clearing cookies can create another profile.
+
+I also left out account recovery, cross-device sync, push notifications and a content-management screen. The word bank has 33 reviewed words; daily sets rotate on a 33-day cycle. A production learning app would need a larger bank, content review, localisation, and practice based on past mistakes.
+
+Validation
+
+Automated tests exercise the real SQL through SQLite locally. They cover grading, invalid answers, time boundaries, streak gaps, badge retention, level boundaries, browser isolation, persistence, simultaneous replay, and recovery when saving succeeds but the response fails. Browser checks exercise the daily task and reward history on a phone-sized viewport. Cloudflare D1 is the production database; the local SQLite adapter is intentionally small and is documented as a testing and development substitute.
+
+The goal was to finish one useful daily loop and make every earned point understandable.

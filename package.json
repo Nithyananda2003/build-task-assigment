@@ -1,0 +1,6 @@
+{
+  "name": "daily-spark", "version": "1.0.0", "private": true, "type": "module",
+  "description": "A small daily English challenge with a server-owned reward ledger.",
+  "engines": { "node": ">=24.15.0" },
+  "scripts": { "dev": "node scripts/dev.mjs", "start": "node scripts/dev.mjs", "build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs" }
+}
