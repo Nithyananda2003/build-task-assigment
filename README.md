@@ -8,21 +8,24 @@ Daily Spark is a responsive daily vocabulary challenge built for modest phones, 
 
 Live app: https://daily-spark-nithyananda.orders741265.chatgpt.site
 
+**Deploy on Vercel:** follow [VERCEL.md](VERCEL.md). The repository includes Vercel API routes, a Turso libSQL adapter, an explicit schema migration command, and a committed `vercel.json` with the build settings. Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` in Vercel after creating and migrating a libSQL database. The original Cloudflare deployment remains available separately.
+
 Read [EXPLAINER.txt](EXPLAINER.txt) for the product choices, implementation tradeoffs, and deliberately omitted features. [api.openapi.json](api.openapi.json) documents the API. Repository: https://github.com/Nithyananda2003/build-task-assigment . The source and an offline Git bundle are included with the delivery.
 
 ## Run locally
 
-Requires Node.js 24.15 or later (uses built-in `node:sqlite`) and Git. No npm packages, API keys, sign-up, or cloud services are needed locally.
+Requires Node.js 24.15 or a later 24.x version (uses built-in `node:sqlite`) and Git. Install dependencies with `npm ci`. No API keys, sign-up, or cloud services are needed for local development and tests. The server-side libSQL SDK is pinned in the lockfile for Vercel; it is not downloaded by the browser.
 
 Clone the repository:
 
 ```sh
 git clone https://github.com/Nithyananda2003/build-task-assigment.git daily-spark
 cd daily-spark
+npm ci
 npm run dev
 ```
 
-If you downloaded a source ZIP, extract it, open a terminal in the folder containing `package.json`, and run `npm run dev`.
+If you downloaded a source ZIP, extract it, open a terminal in the folder containing `package.json`, then run `npm ci` and `npm run dev`.
 
 Open http://127.0.0.1:4173 in your browser. `npm run dev` builds the Worker and serves it through a small Node HTTP adapter. Restart the command after changing source files. `PORT` can override the default port.
 
@@ -31,9 +34,10 @@ SQLite data is saved to `.data/spark.sqlite`, which is ignored by Git. The first
 ```sh
 npm test
 npm run build
+npm run build:vercel
 ```
 
-Tests use real SQLite with the same schema and SQL statements as production. They do not require a running server or an internet connection. Building produces a single ES module at `dist/server/index.js`.
+Tests use real SQLite and the libSQL SDK with the same schema and SQL statements as production. After dependencies are installed, tests need no running server, internet connection or credentials. `npm run build` produces the Cloudflare Worker at `dist/server/index.js`; `npm run build:vercel` copies the static frontend to `dist/vercel`. Vercel builds the three root `api/` entrypoints as Node.js Functions.
 
 ## Daily loop and rewards
 
@@ -56,6 +60,13 @@ worker/index.js         Cloudflare Worker HTTP handler and D1 reward persistence
 scripts/build.mjs       Embeds local assets into a dependency-free Worker
 scripts/dev.mjs         Local HTTP bridge to the exact built Worker
 scripts/database.mjs    SQLite adapter for local development and tests
+api/                    Vercel Functions for health, state and completion
+server/                 Vercel handler and remote Turso libSQL adapter
+scripts/build-vercel.mjs  Static asset preparation for Vercel
+scripts/migrate-turso.mjs  Explicit, transactional remote schema migration
+vercel.json             Vercel build, runtime and response-header settings
+.env.example            Server-only database variable names and placeholders
+VERCEL.md               Database setup and click-by-click Vercel deployment
 scripts/validate-artifact.mjs  Validates the generated ESM deployment
 scripts/quality.mjs     Build, asset-budget and submission-artifact checks
 drizzle/                Versioned SQL migration and migration journal
@@ -83,7 +94,9 @@ The service worker caches the app shell after the first successful visit. It nev
 
 ## Production hosting
 
-The app is a portable Cloudflare Worker ESM with one D1 binding named `DB`. Sites provisions D1 and applies the checked-in SQL migration during publication. The tracked `.openai/hosting.json` contains the Site project ID and `d1: "DB"`; no secrets are committed. The source repository is saved before a deployment artifact is published.
+Vercel uses `api/*.js` Node.js Functions and a remote Turso **libSQL** database. See [VERCEL.md](VERCEL.md) for creating the database, applying the schema, setting environment variables and importing this repository. Each API request uses the same scoring and reward handler as the Worker, preserving the day boundaries, cookie isolation, server authority and atomic insert semantics. Turso supplies durable storage; Vercel does not write a local SQLite file. Migrations are explicit (`npm run db:migrate`), not part of requests or builds. A separate Vercel domain starts a new browser profile and does not inherit the Cloudflare D1 database.
+
+The original app also builds as a portable Cloudflare Worker ESM with one D1 binding named `DB`. Sites provisions D1 and applies the checked-in SQL migration during publication. The tracked `.openai/hosting.json` contains the Site project ID and `d1: "DB"`; no secrets are committed. The source repository is saved before a deployment artifact is published.
 
 To host independently, build with `npm run build`, configure your Worker entrypoint as `dist/server/index.js`, bind a D1 database as `DB`, apply `drizzle/0000_daily_spark.sql` to that database once, and deploy the Worker with your chosen Cloudflare tooling. Do not run the local Node server as a Worker. HTTP adapters preserve the same fetch handler; production has no Node or SQLite runtime dependency.
 
@@ -91,9 +104,9 @@ A new Sites deployment is private until sharing is changed. Check that external 
 
 ## Validation and limits
 
-26 automated domain, API and browser-client tests cover scores, invalid input, server-owned dates, year/leap-day transitions, streak gaps, retained badges, level boundaries, distinct browser profiles, SQL persistence, concurrent replay, origin validation, payload limits, missing database errors, retry after a committed result loses its response, non-JSON hosting errors, malformed responses, bounded read retries, and safe submission failures.
+35 automated domain, API, browser-client and Vercel/libSQL tests cover scores, invalid input, server-owned dates, year/leap-day transitions, streak gaps, retained badges, level boundaries, distinct browser profiles, SQL persistence, concurrent replay, origin validation, payload limits, missing database errors, retry after a committed result loses its response, non-JSON hosting errors, malformed responses, bounded read retries, safe submission failures, migration replay and checksums, and Vercel handler behavior with the real libSQL SDK against local databases.
 
-Local browser QA exercises the phone-sized challenge and reward history. Browser QA evidence and any production verification notes are included in the delivery report. Tests establish local SQLite behavior; the production smoke check establishes deployed D1 behavior separately.
+Local browser QA exercises the phone-sized challenge and reward history. Browser QA evidence and any production verification notes are included in the delivery report. Tests establish local SQLite/libSQL behavior; the previous production browser checks established deployed D1 persistence separately. Vercel and remote Turso have not been deployed or verified in this account; they require the database credentials and import steps described in VERCEL.md.
 
 Intentionally omitted: accounts/recovery, cross-device sync, cash payouts, rate limiting, notifications, localisation, a larger curated word bank, and a CMS. Production money handling needs verified identity, abuse controls, a financial ledger and reconciliation before integration with a payment provider. No such capability is implied by demo points.
 

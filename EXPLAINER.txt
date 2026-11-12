@@ -31,3 +31,7 @@ Validation
 Automated tests exercise the real SQL through SQLite locally. They cover grading, invalid answers, time boundaries, streak gaps, badge retention, level boundaries, browser isolation, persistence, simultaneous replay, and recovery when saving succeeds but the response fails. Browser checks exercise the daily task and reward history on a phone-sized viewport. Cloudflare D1 is the production database; the local SQLite adapter is intentionally small and is documented as a testing and development substitute.
 
 The goal was to finish one useful daily loop and make every earned point understandable.
+
+Vercel deployment support
+
+The repository now also supports Vercel. Static files are served by Vercel, and three Node.js Functions reuse the existing scoring handler. A small adapter connects that handler to a persistent Turso libSQL database through the official SDK. The SQL constraints and first-attempt reward rule are shared across hosts. Schema migrations are an explicit command, with transactional application and checksum tracking. Tokens stay in server environment variables. VERCEL.md gives the database and deployment steps. Local tests exercise the Vercel handler through the real libSQL SDK; a live Vercel/Turso deployment still needs the user's database configuration. A new hosting domain starts a separate browser profile.

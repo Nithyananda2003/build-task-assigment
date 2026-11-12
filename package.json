@@ -1,6 +1,21 @@
 {
-  "name": "daily-spark", "version": "1.0.0", "private": true, "type": "module",
+  "name": "daily-spark",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
   "description": "A small daily English challenge with a server-owned reward ledger.",
-  "engines": { "node": ">=24.15.0" },
-  "scripts": { "dev": "node scripts/dev.mjs", "start": "node scripts/dev.mjs", "build": "node scripts/build.mjs", "test": "node --test tests/*.test.mjs" }
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "start": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate-turso.mjs",
+    "test": "node --test --test-concurrency=1 tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "0.18.0"
+  }
 }
